@@ -33,12 +33,12 @@ git add .
 
 ```bash
 # 3. Commit perubahan
-git commit -m "Initial commit - Simple CRUD Kamus Mini"
+git commit -m "Initial commit - Nama Perubahan"
 ```
 
 ```bash
 # 4. Hubungkan dengan repository GitHub
-git remote add origin https://github.com/username/nama-repo.git
+git remote add origin https://github.com/BintangBudi/KELOMPOK-2---Kamus-Mini-Istilah-istilah-dalam-dunia-Informatika.git
 ```
 
 ```bash
