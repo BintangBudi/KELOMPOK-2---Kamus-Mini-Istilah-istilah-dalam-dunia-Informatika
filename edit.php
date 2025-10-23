@@ -1,65 +1,56 @@
 <?php
 require_once "functions.php";
 
-if (isset($_GET["id"])) {
-    $data = cari($_GET["id"]);
-    if (count($data) === 0) {
-        echo "<script>
-                alert('Istilah tidak ditemukan!');
-                document.location.href = 'index.php';
-              </script>";
-        exit;
-    }
-    $data = $data[0];
+header('Content-Type: application/json');
 
-    if (isset($_POST["submit"])) {
-        $_POST["id"] = $data["id"];
-        $result = ubah($_POST);
-
-        if ($result) {
-            echo "<script>
-                    alert('Istilah berhasil diubah!');
-                    document.location.href = 'index.php';
-                  </script>";
+// LOGIKA 1: Mengambil data untuk ditampilkan di modal (Method GET)
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (isset($_GET['id'])) {
+        $id = (int)$_GET['id'];
+        $data = getIstilahById($id); 
+        
+        if ($data) {
+            echo json_encode(['status' => 'success', 'data' => $data]);
         } else {
-            echo "<script>
-                    alert('Istilah gagal diubah!');
-                    document.location.href = 'edit.php?id={$_GET["id"]}';
-                  </script>";
+            echo json_encode(['status' => 'error', 'message' => 'Data tidak ditemukan.']);
         }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'ID tidak disediakan.']);
     }
-} else {
-    echo "<script>
-            alert('Istilah tidak ditemukan!');
-            document.location.href = 'index.php';
-          </script>";
-    exit;
+}
+
+// LOGIKA 2: Memproses update data (Method POST)
+else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    $response = [
+        'status' => 'error',
+        'message' => 'Gagal mengubah istilah. (Unknown error)'
+    ];
+
+    if (!empty($_POST) && isset($_POST['id'])) {
+        
+        $result = ubah($_POST); // $result sekarang berisi 0, 1, atau 2
+        
+        if ($result === 1) { 
+            $response['status'] = 'success';
+            $response['message'] = 'Istilah berhasil diubah!';
+        } else if ($result === 2) { 
+            $response['status'] = 'success'; 
+            $response['message'] = 'Tidak ada perubahan data.';
+        } else { // Kode 0
+            $response['status'] = 'error';
+            $response['message'] = 'Gagal mengubah istilah. Terjadi kesalahan database.';
+        }
+        
+    } else {
+        $response['message'] = 'Data tidak lengkap.';
+    }
+
+    echo json_encode($response);
+} 
+
+// Jika method tidak didukung
+else {
+    echo json_encode(['status' => 'error', 'message' => 'Metode request tidak valid.']);
 }
 ?>
-
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"
-              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Edit Istilah</title>
-    </head>
-    <body>
-        <h1>Edit Istilah <?= $data["istilah"] ?> </h1>
-        <form action="" method="post">
-            <div>
-                <label for="istilah">Istilah</label>
-                <input id="istilah" type="text" name="istilah" required value="<?= $data['istilah'] ?>"/>
-            </div>
-            <div>
-                <label for="definisi">Definisi</label>
-                <textarea id="definisi" name="definisi" required><?= $data['definisi'] ?></textarea>
-            </div>
-            <div>
-                <button type="submit" name="submit">Simpan</button>
-            </div>
-        </form>
-    </body>
-</html>
