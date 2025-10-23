@@ -1,18 +1,25 @@
 <?php
 require_once "functions.php";
 
-if (isset($_GET["istilah"])) {
-    $result = hapus($_GET["istilah"]);
+header('Content-Type: application/json');
+
+$response = [
+    'status' => 'error',
+    'message' => 'Gagal menghapus istilah.'
+];
+
+// Kita pakai POST untuk hapus agar lebih aman
+if (isset($_POST["id"])) {
+    $id = (int)$_POST["id"];
+    $result = hapus($id); // Panggil fungsi hapus() yang sudah direvisi
 
     if ($result) {
-        echo "<script>
-                alert('Istilah berhasil dihapus!');
-                document.location.href = 'index.php';
-              </script>";
-    } else {
-        echo "<script>
-                alert('Istilah gagal dihapus!');
-                document.location.href = 'index.php';
-              </script>";
+        $response['status'] = 'success';
+        $response['message'] = 'Istilah berhasil dihapus!';
     }
+} else {
+     $response['message'] = 'ID tidak ditemukan.';
 }
+
+echo json_encode($response);
+?>
