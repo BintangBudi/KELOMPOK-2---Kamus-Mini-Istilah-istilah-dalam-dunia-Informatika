@@ -1,5 +1,5 @@
 <?php
-$koneksi = new mysqli("127.0.0.1", "erika", "kawaii", "kp");
+$koneksi = new mysqli("localhost", "root", "", "db_kamus");
 
 if ($koneksi->connect_error) {
     die("Koneksi gagal: $koneksi->connect_error");
